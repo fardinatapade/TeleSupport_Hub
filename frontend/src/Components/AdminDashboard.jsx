@@ -13,9 +13,11 @@ import {
   FaUserAlt,
   FaExchangeAlt,
   FaTimes,
+  FaEnvelope,
+  FaPhoneAlt,
+  FaHome,
 } from "react-icons/fa";
 import { API_URL } from "../config";
-
 
 const Toast = ({ message, type, show, onClose }) => {
   useEffect(() => {
@@ -32,12 +34,23 @@ const Toast = ({ message, type, show, onClose }) => {
   const isSuccess = type === "success";
 
   return (
-    <div style={{ ...toastStyles.toastContainer, ...(isSuccess ? toastStyles.success : toastStyles.error) }}>
+    <div
+      style={{
+        ...toastStyles.toastContainer,
+        ...(isSuccess ? toastStyles.success : toastStyles.error),
+      }}
+    >
       <div style={toastStyles.iconWrapper}>
-        {isSuccess ? <FaCheckCircle size={20} /> : <FaExclamationCircle size={20} />}
+        {isSuccess ? (
+          <FaCheckCircle size={20} />
+        ) : (
+          <FaExclamationCircle size={20} />
+        )}
       </div>
       <div style={toastStyles.textWrapper}>
-        <strong style={toastStyles.title}>{isSuccess ? "Success" : "Operation Update"}</strong>
+        <strong style={toastStyles.title}>
+          {isSuccess ? "Success" : "Notification"}
+        </strong>
         <p style={toastStyles.message}>{message}</p>
       </div>
       <button onClick={onClose} style={toastStyles.closeBtn}>
@@ -52,33 +65,34 @@ const AdminDashboard = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
-  
   const triggerToast = (message, type = "success") => {
     setToast({ show: true, message, type });
   };
 
-  
+  const handleHomeNavigation = () => {
+    window.location.href = "/";
+  };
+
   const sortTicketsByPriority = (ticketArray) => {
     if (!Array.isArray(ticketArray)) return [];
-    
+
     return [...ticketArray].sort((a, b) => {
-      const statusOrder = { "Pending": 1, "In Progress": 2, "Resolved": 3 };
-      
+      const statusOrder = { Pending: 1, "In Progress": 2, Resolved: 3 };
       const orderA = statusOrder[a.status] || 4;
       const orderB = statusOrder[b.status] || 4;
-      
       return orderA - orderB;
     });
   };
 
-  
   const fetchAllTickets = async () => {
     try {
       setIsLoading(true);
-      
-      
       const cleanBaseUrl = API_URL.replace(/\/+$/, "");
 
       const response = await fetch(`${cleanBaseUrl}/tickets/`, {
@@ -88,21 +102,19 @@ const AdminDashboard = () => {
 
       if (response.ok) {
         const data = await response.json();
-        
         let rawTickets = [];
         if (data && Array.isArray(data.tickets)) {
           rawTickets = data.tickets;
         } else if (Array.isArray(data)) {
           rawTickets = data;
         }
-
         setTickets(sortTicketsByPriority(rawTickets));
       } else {
-        triggerToast("Failed to pull incoming infrastructure data stream logs.", "error");
+        triggerToast("Failed to load incoming support tickets.", "error");
       }
     } catch (error) {
       console.error("Dashboard fetching engine failure:", error);
-      triggerToast("Connection failed. Core server operational nodes offline.", "error");
+      triggerToast("Connection failed. Support server is offline.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -112,33 +124,30 @@ const AdminDashboard = () => {
     fetchAllTickets();
   }, []);
 
- 
   const handleStatusChange = async (id, newStatus) => {
     const targetTicket = tickets.find((t) => t.id === id);
     if (!targetTicket) return;
 
-   
     const payload = {
       user_id: Number(targetTicket.user_id || 1),
       full_name: targetTicket.full_name || targetTicket.user || "Client User",
-      issue_type: targetTicket.issue_type || targetTicket.type || "Network Issue",
+      issue_type:
+        targetTicket.issue_type || targetTicket.type || "Network Issue",
       subject: targetTicket.subject || targetTicket.issue || "Support Request",
       description: targetTicket.description || "No description provided",
       email: targetTicket.email || "info@example.com",
       phone: targetTicket.phone || "0000000000",
-      status: String(newStatus)
+      status: String(newStatus),
     };
 
     try {
-    
       const cleanBaseUrl = API_URL.replace(/\/+$/, "");
 
-      
       const response = await fetch(`${cleanBaseUrl}/tickets/${id}`, {
         method: "PUT",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          Accept: "application/json",
         },
         body: JSON.stringify(payload),
       });
@@ -150,55 +159,77 @@ const AdminDashboard = () => {
           );
           return sortTicketsByPriority(updated);
         });
-        triggerToast(`Index #${id} re-assigned to ${newStatus} state successfully!`, "success");
+        triggerToast(
+          `Ticket #${id} updated to ${newStatus} successfully!`,
+          "success"
+        );
       } else {
-        triggerToast("Server rejected pipeline mutation state update.", "error");
+        triggerToast("Server rejected status update.", "error");
       }
     } catch (error) {
       console.error("Status lifecycle modification failure:", error);
-      triggerToast("Network error. Unable to synchronize status change with backend.", "error");
+      triggerToast(
+        "Network error. Unable to sync status with server.",
+        "error"
+      );
     }
   };
 
-  
   const totalTickets = tickets.length;
-  const pendingCount = tickets.filter((t) => (t.status || "").trim() === "Pending").length;
-  const resolvedCount = tickets.filter((t) => (t.status || "").trim() === "Resolved").length;
+  const pendingCount = tickets.filter(
+    (t) =>
+      (t.status || "").trim() === "Pending" ||
+      (t.status || "").trim() === "In Progress"
+  ).length;
+  const resolvedCount = tickets.filter(
+    (t) => (t.status || "").trim() === "Resolved"
+  ).length;
 
-  
   const filteredTickets = tickets.filter((ticket) => {
     const searchString = search.toLowerCase();
     const ticketIssue = (ticket.issue || ticket.subject || "").toLowerCase();
     const ticketUser = (ticket.user || ticket.full_name || "").toLowerCase();
+    const ticketEmail = (ticket.email || "").toLowerCase();
+    const ticketPhone = (ticket.phone || "").toLowerCase();
     const ticketIdStr = (ticket.id || "").toString();
 
     const matchesSearch =
       ticketIssue.includes(searchString) ||
       ticketUser.includes(searchString) ||
+      ticketEmail.includes(searchString) ||
+      ticketPhone.includes(searchString) ||
       ticketIdStr.includes(searchString);
 
-    const matchesStatus = statusFilter === "All" || ticket.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "All" || ticket.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
 
   const getStatusClass = (status) => {
     switch (status) {
-      case "Resolved": return "status-resolved";
-      case "Pending": return "status-pending";
-      default: return "status-progress";
+      case "Resolved":
+        return "status-resolved";
+      case "Pending":
+        return "status-pending";
+      default:
+        return "status-progress";
     }
   };
 
   const getTypeColor = (type) => {
     switch (type) {
       case "Network Issue":
-      case "Network": return "#3b82f6";
+      case "Network":
+        return "#3b82f6";
       case "Recharge Problem":
-      case "Recharge": return "#ec4899";
+      case "Recharge":
+        return "#ec4899";
       case "SIM Issue":
-      case "SIM": return "#8b5cf6";
-      default: return "#06b6d4";
+      case "SIM":
+        return "#8b5cf6";
+      default:
+        return "#06b6d4";
     }
   };
 
@@ -217,62 +248,76 @@ const AdminDashboard = () => {
         <div style={styles.blurOne}></div>
         <div style={styles.blurTwo}></div>
 
-    
         <section style={styles.heroSection}>
           <div className="hero-center-panel">
-            <div className="premium-badge">
-              <FaUserShield className="badge-icon" />
-              Administrative Command Core
+            <div className="header-badge-row">
+              <div className="premium-badge">
+                <FaUserShield className="badge-icon" />
+                Admin Control Center
+              </div>
+
+              <button
+                onClick={handleHomeNavigation}
+                className="home-nav-btn"
+                title="Go to Home"
+              >
+                <FaHome className="home-icon" />
+                <span>Home</span>
+              </button>
             </div>
 
             <h1 style={styles.heading} className="dashboard-title">
-              System Control & <br />
-              Infrastructure Operations
+              Support Dashboard & <br />
+              Ticket Management
             </h1>
 
             <p style={styles.description}>
-              Oversee high-capacity cloud telecom metrics, re-route traffic trouble logs, and 
-              manipulate ticket tracking lifecycles globally across standard communication nodes.
+              Review incoming service logs, troubleshoot client connections, and
+              update support ticket resolution statuses in real-time.
             </p>
           </div>
         </section>
 
-       
         <section style={styles.metricsSection}>
           <div className="metrics-grid">
             <div className="metric-box total">
-              <div className="metric-icon-wrap"><FaClipboardList /></div>
+              <div className="metric-icon-wrap">
+                <FaClipboardList />
+              </div>
               <div>
-                <span className="metric-title">Total Logs</span>
+                <span className="metric-title">Total Tickets</span>
                 <h2 className="metric-number">{totalTickets}</h2>
               </div>
             </div>
 
             <div className="metric-box pending">
-              <div className="metric-icon-wrap"><FaExclamationCircle /></div>
+              <div className="metric-icon-wrap">
+                <FaExclamationCircle />
+              </div>
               <div>
-                <span className="metric-title">Awaiting Action</span>
+                <span className="metric-title">Active</span>
                 <h2 className="metric-number">{pendingCount}</h2>
               </div>
             </div>
 
             <div className="metric-box resolved">
-              <div className="metric-icon-wrap"><FaCheckCircle /></div>
+              <div className="metric-icon-wrap">
+                <FaCheckCircle />
+              </div>
               <div>
-                <span className="metric-title">Closed Settled</span>
+                <span className="metric-title">Resolved Cases</span>
                 <h2 className="metric-number">{resolvedCount}</h2>
               </div>
             </div>
           </div>
         </section>
 
-      
         <section className="controls-layout-wrapper">
           <div className="search-bar-container">
             <FaSearch className="input-embed-icon" />
             <input
               type="text"
-              placeholder="Filter by issue indexes, ticket IDs, client names..."
+              placeholder="Search by issue description, ID, name, email, phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="dashboard-search-input"
@@ -285,91 +330,193 @@ const AdminDashboard = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="dashboard-filter-dropdown"
             >
-              <option value="All">All Operations Matrix</option>
+              <option value="All">All Tickets</option>
               <option value="Pending">Pending Validation</option>
-              <option value="In Progress">Under Active Mitigation</option>
-              <option value="Resolved">Resolved & Finalized</option>
+              <option value="In Progress">Under Investigation</option>
+              <option value="Resolved">Resolved & Closed</option>
             </select>
           </div>
         </section>
 
-       
         <section style={styles.ticketSection}>
           {isLoading ? (
             <div style={styles.messageState}>
               <div style={styles.spinner}></div>
-              <p style={{ marginTop: "20px", color: "#64748b", fontWeight: "700" }}>Synchronizing matrix operation logs directly...</p>
+              <p
+                style={{
+                  marginTop: "20px",
+                  color: "#64748b",
+                  fontWeight: "700",
+                }}
+              >
+                Loading support logs...
+              </p>
             </div>
           ) : filteredTickets.length === 0 ? (
             <div className="empty-state-fallback">
-              <div className="empty-state-radar"><FaLayerGroup /></div>
-              <h3>No Operational System Indexes Match Filter Parameters.</h3>
-              <p>Verify spelling input variables or expand filtering boundaries.</p>
+              <div className="empty-state-radar">
+                <FaLayerGroup />
+              </div>
+              <h3>No match found.</h3>
+              <p>
+                Try refining your search keyword filters or switch category
+                views.
+              </p>
             </div>
           ) : (
             <div className="dashboard-matrix-grid">
               {filteredTickets.map((ticket) => (
-                <div key={ticket.id} className={`ultra-ticket-card ${getStatusClass(ticket.status)}`}>
-                  
-                 
+                <div
+                  key={ticket.id}
+                  className={`ultra-ticket-card ${getStatusClass(
+                    ticket.status
+                  )}`}
+                >
                   <div className="card-top-row">
                     <div className="card-identity-block">
-                      <div style={styles.headsetIconBg} className="headset-icon-bg">
+                      <div
+                        style={styles.headsetIconBg}
+                        className="headset-icon-bg"
+                      >
                         <FaHeadset />
                       </div>
                       <div>
-                        <span className="tracking-id-tag">Log Ref: #{ticket.id}</span>
-                        <span className="category-pill" style={{ '--pill-color': getTypeColor(ticket.issue_type || ticket.type) }}>
+                        <span className="tracking-id-tag">
+                          Ticket ID: #{ticket.id}
+                        </span>
+                        <span
+                          className="category-pill"
+                          style={{
+                            "--pill-color": getTypeColor(
+                              ticket.issue_type || ticket.type
+                            ),
+                          }}
+                        >
                           {ticket.issue_type || ticket.type || "General"}
                         </span>
                       </div>
                     </div>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <span className={`state-indicator-badge ${getStatusClass(ticket.status)}`}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <span
+                        className={`state-indicator-badge ${getStatusClass(
+                          ticket.status
+                        )}`}
+                      >
                         {ticket.status || "Pending"}
                       </span>
                     </div>
                   </div>
 
-                
                   <div className="client-meta-profile">
-                    <div style={styles.avatarPlaceholder} className="avatar-placeholder">
+                    <div
+                      style={styles.avatarPlaceholder}
+                      className="avatar-placeholder"
+                    >
                       <FaUserAlt />
                     </div>
                     <div>
-                      <p className="client-meta-label">Assigned User Link</p>
-                      <h4 className="client-meta-name">{ticket.full_name || ticket.user || "Unknown Client"}</h4>
+                      <p className="client-meta-label">Customer Name</p>
+                      <h4 className="client-meta-name">
+                        {ticket.full_name || ticket.user || "Unknown Customer"}
+                      </h4>
                     </div>
                   </div>
 
-                 
-                  <h3 className="ticket-main-headline">{ticket.subject || ticket.issue || "No Subject Parameter"}</h3>
-                  <p style={{ color: "#475569", fontSize: "0.92rem", marginBottom: "16px", lineHeight: "1.5" }}>{ticket.description}</p>
+                  <h3 className="ticket-main-headline">
+                    {ticket.subject || ticket.issue || "No Subject Given"}
+                  </h3>
+                  <p
+                    style={{
+                      color: "#475569",
+                      fontSize: "0.92rem",
+                      marginBottom: "20px",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    {ticket.description}
+                  </p>
 
-               
-                  <div className="ticket-timeline-anchor">
-                    <FaCalendarAlt className="timeline-icon" />
-                    <span>Logged System Timestamp: <strong>
-                      {ticket.created_at || ticket.date ? new Date(ticket.created_at || ticket.date).toLocaleDateString('en-GB', {
-                        day: '2-digit', month: 'short', year: 'numeric'
-                      }) : "Recent Entry"}
-                    </strong></span>
+                  <div style={styles.detailsGrid}>
+                    <div style={styles.detailsItem}>
+                      <FaEnvelope style={styles.detailsIcon} />
+                      <span style={styles.detailsText}>
+                        {ticket.email || "No Email"}
+                      </span>
+                    </div>
+                    <div style={styles.detailsItem}>
+                      <FaPhoneAlt style={styles.detailsIcon} />
+                      <span style={styles.detailsText}>
+                        {ticket.phone || "No Phone"}
+                      </span>
+                    </div>
                   </div>
 
-               
+                  <div
+                    className="ticket-timeline-anchor"
+                    style={styles.timelineContainer}
+                  >
+                    <div style={styles.timelineItem}>
+                      <FaCalendarAlt className="timeline-icon" />
+                      <span>
+                        Created:{" "}
+                        <strong>
+                          {ticket.created_at
+                            ? new Date(ticket.created_at).toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )
+                            : "N/A"}
+                        </strong>
+                      </span>
+                    </div>
+                    <div style={styles.timelineItem}>
+                      <FaClock className="timeline-icon" />
+                      <span>
+                        Updated:{" "}
+                        <strong>
+                          {ticket.updated_at
+                            ? new Date(ticket.updated_at).toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )
+                            : "N/A"}
+                        </strong>
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="card-action-divider"></div>
 
-                 
                   <div className="control-manipulation-area">
                     <div className="manipulation-meta">
                       <FaExchangeAlt />
-                      <span>Update Status</span>
+                      <span>Change Status</span>
                     </div>
-                    
+
                     <select
                       value={ticket.status || "Pending"}
-                      onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
+                      onChange={(e) =>
+                        handleStatusChange(ticket.id, e.target.value)
+                      }
                       className="internal-state-selector"
                     >
                       <option value="Pending">Pending</option>
@@ -377,7 +524,6 @@ const AdminDashboard = () => {
                       <option value="Resolved">Resolved</option>
                     </select>
                   </div>
-
                 </div>
               ))}
             </div>
@@ -387,7 +533,6 @@ const AdminDashboard = () => {
     </>
   );
 };
-
 
 const toastStyles = {
   toastContainer: {
@@ -403,15 +548,43 @@ const toastStyles = {
     maxWidth: "420px",
     width: "calc(100% - 48px)",
     boxSizing: "border-box",
-    animation: "toastSlideIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+    animation:
+      "toastSlideIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
   },
-  success: { background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#166534" },
-  error: { background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b" },
-  iconWrapper: { display: "flex", alignItems: "center", justifyContent: "center", marginRight: "14px", flexShrink: 0 },
+  success: {
+    background: "#f0fdf4",
+    border: "1px solid #bbf7d0",
+    color: "#166534",
+  },
+  error: {
+    background: "#fef2f2",
+    border: "1px solid #fecaca",
+    color: "#991b1b",
+  },
+  iconWrapper: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: "14px",
+    flexShrink: 0,
+  },
   textWrapper: { flexGrow: 1, marginRight: "12px" },
-  title: { display: "block", fontSize: "0.95rem", fontWeight: "700", marginBottom: "2px" },
+  title: {
+    display: "block",
+    fontSize: "0.95rem",
+    fontWeight: "700",
+    marginBottom: "2px",
+  },
   message: { margin: 0, fontSize: "0.88rem", lineHeight: "1.4", opacity: 0.9 },
-  closeBtn: { background: "none", border: "none", color: "inherit", cursor: "pointer", display: "flex", fontSize: "1rem", opacity: 0.6 },
+  closeBtn: {
+    background: "none",
+    border: "none",
+    color: "inherit",
+    cursor: "pointer",
+    display: "flex",
+    fontSize: "1rem",
+    opacity: 0.6,
+  },
 };
 
 const styles = {
@@ -419,7 +592,8 @@ const styles = {
     minHeight: "100vh",
     position: "relative",
     overflow: "hidden",
-    background: "linear-gradient(135deg, #f8fafc 0%, #fff1f2 50%, #f8fafc 100%)",
+    background:
+      "linear-gradient(135deg, #f8fafc 0%, #fff1f2 50%, #f8fafc 100%)",
     paddingTop: "130px",
     color: "#0f172a",
   },
@@ -500,6 +674,44 @@ const styles = {
     color: "#ef4444",
     fontSize: "0.85rem",
   },
+  detailsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "10px",
+    background: "#f8fafc",
+    padding: "12px 16px",
+    borderRadius: "16px",
+    marginBottom: "16px",
+    border: "1px solid #f1f5f9",
+  },
+  detailsItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  },
+  detailsIcon: {
+    color: "#ef4444",
+    fontSize: "1rem",
+    flexShrink: 0,
+  },
+  detailsText: {
+    fontSize: "0.88rem",
+    color: "#334155",
+    fontWeight: "500",
+  },
+  timelineContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    marginBottom: "20px",
+  },
+  timelineItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    color: "#64748b",
+    fontSize: "0.85rem",
+  },
   messageState: {
     display: "flex",
     flexDirection: "column",
@@ -518,7 +730,7 @@ const styles = {
     borderTopColor: "#dc2626",
     borderRadius: "50%",
     animation: "spin 0.8s linear infinite",
-  }
+  },
 };
 
 const responsiveStyles = `
@@ -526,17 +738,13 @@ const responsiveStyles = `
   to { transform: rotate(360deg); }
 }
 
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-  width: 100%;
-}
-
-.dashboard-matrix-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 32px;
+.header-badge-row {
+  display: flex;
+  align-items: center;
+  justifyContent: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .premium-badge {
@@ -553,12 +761,47 @@ const responsiveStyles = `
   letter-spacing: 0.5px;
   text-transform: uppercase;
   box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
-  margin-bottom: 24px;
 }
 
-.badge-icon {
+.home-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   color: #ef4444;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s ease-in-out;
+}
+
+.home-nav-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.badge-icon, .home-icon {
   font-size: 1rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+.dashboard-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 32px;
 }
 
 .metric-box {
@@ -579,13 +822,14 @@ const responsiveStyles = `
   transform: translateY(-4px);
 }
 
+/* Perfect centering implementation for icons inside square boundaries */
 .metric-icon-wrap {
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justifyContent: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   font-size: 1.3rem;
   flex-shrink: 0;
 }
@@ -783,16 +1027,6 @@ const responsiveStyles = `
   margin: 0 0 10px 0;
 }
 
-.ticket-timeline-anchor {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 24px;
-}
-
 .timeline-icon {
   color: #94a3b8;
 }
@@ -907,6 +1141,10 @@ const responsiveStyles = `
     align-items: center !important;
   }
   
+  .header-badge-row {
+    justify-content: center !important;
+  }
+
   .ultra-ticket-card {
     padding: 24px !important;
     border-radius: 24px !important;

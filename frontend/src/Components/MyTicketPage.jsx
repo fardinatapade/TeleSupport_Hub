@@ -232,7 +232,7 @@ const MyTicketPage = () => {
               </p>
             </div>
           ) : (
-            <div style={styles.grid}>
+            <div style={styles.grid} className="ticket-page-grid">
               {filteredTickets.map((ticket) => (
                 <div
                   key={ticket.id}
@@ -240,10 +240,12 @@ const MyTicketPage = () => {
                   className={`ticket-card ${getStatusClass(ticket.status)}`}
                 >
                   <div style={styles.cardTop}>
-                    <div style={styles.ticketIcon}>
+                    <div
+                      style={styles.ticketIcon}
+                      className="card-headset-icon"
+                    >
                       <FaHeadset />
                     </div>
-                    
                   </div>
 
                   <h2 style={styles.ticketTitle}>
@@ -255,15 +257,15 @@ const MyTicketPage = () => {
                       "No description logs attached to this tracking matrix index reference."}
                   </p>
 
-                  <div style={styles.infoWrapper}>
-                    <div style={styles.infoBox}>
+                  <div style={styles.infoWrapper} className="card-info-layout">
+                    <div style={styles.infoBox} className="card-info-item">
                       <span style={styles.infoLabel}>Type</span>
                       <span style={styles.infoValue}>
                         {ticket.issue_type || "General"}
                       </span>
                     </div>
 
-                    <div style={styles.infoBox}>
+                    <div style={styles.infoBox} className="card-info-item">
                       <span style={styles.infoLabel}>Filed Date</span>
                       <span style={styles.infoValue}>
                         {ticket.created_at
@@ -279,7 +281,10 @@ const MyTicketPage = () => {
                       </span>
                     </div>
 
-                    <div style={{ ...styles.infoBox, ...styles.centerInfoBox }}>
+                    <div
+                      style={{ ...styles.infoBox, ...styles.centerInfoBox }}
+                      className="card-info-item status-full-width"
+                    >
                       <span style={styles.infoLabel}>Ticket Status</span>
                       <span
                         style={{
@@ -533,7 +538,6 @@ const responsiveStyles = `
   box-shadow: 0 20px 40px rgba(15,23,42,0.06) !important;
 }
 
-/* --- STATE INDICATOR EDGE ACCENTS --- */
 .ticket-card::after {
   content: '';
   position: absolute;
@@ -561,41 +565,60 @@ input:focus {
   border: 1px solid #e2e8f0;
 }
 
-@media(max-width:992px){
-  .hero-center{
-    text-align:center;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
+@media(max-width: 992px) {
+  .hero-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }
 
-@media(max-width:768px) {
+@media(max-width: 768px) {
+  .ticket-page-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
   .ticket-card {
     text-align: center;
   }
+  .card-headset-icon {
+    margin: 0 auto !important;
+  }
   .ticket-card .card-top {
-    flex-direction: column !important;
-    gap: 14px !important;
-  }
-  .ticket-card .info-wrapper {
     justify-content: center !important;
-    flex-direction: column !important;
+    margin-bottom: 20px !important;
   }
-  .ticket-card .info-box {
-    align-items: center !important;
+  .card-info-layout {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+  }
+  .card-info-item {
+    flex: 1 1 calc(50% - 7px) !important;
+    width: auto !important;
+  }
+  .status-full-width {
+    flex: 1 1 100% !important;
     width: 100% !important;
   }
 }
 
-@media(max-width:500px){
+@media(max-width: 500px) {
   section {
-    padding-left:6% !important;
-    padding-right:6% !important;
+    padding-left: 5% !important;
+    padding-right: 5% !important;
   }
   .ticket-card {
-    padding: 30px 24px !important;
+    padding: 28px 20px !important;
     border-radius: 24px !important;
+  }
+  .card-info-layout {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .card-info-item {
+    width: 100% !important;
+    flex: 1 1 100% !important;
   }
 }
 `;

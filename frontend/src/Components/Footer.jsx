@@ -54,16 +54,26 @@ const Footer = () => {
             </p>
 
             <div className="footer-contact-row">
-              <div style={styles.contactItem} className="footer-glass-card">
-                <FaPhoneAlt style={styles.contactIcon} />
+              <div
+                style={styles.contactItem}
+                className="footer-glass-card footer-contact-card"
+              >
+                <div style={styles.contactIconWrap}>
+                  <FaPhoneAlt />
+                </div>
                 <div style={{ textAlign: "left" }}>
                   <span style={styles.contactLabel}>24/7 Support Line</span>
                   <p style={styles.contactValue}>+1 (800) 555-TELE</p>
                 </div>
               </div>
 
-              <div style={styles.contactItem} className="footer-glass-card">
-                <FaEnvelope style={styles.contactIcon} />
+              <div
+                style={styles.contactItem}
+                className="footer-glass-card footer-contact-card"
+              >
+                <div style={styles.contactIconWrap}>
+                  <FaEnvelope />
+                </div>
                 <div style={{ textAlign: "left" }}>
                   <span style={styles.contactLabel}>Online Desk</span>
                   <p style={styles.contactValue}>support@telesupporthub.com</p>
@@ -73,7 +83,9 @@ const Footer = () => {
           </div>
 
           <div style={styles.linksSection} className="footer-col-links">
-            <h3 style={styles.sectionTitle}>Explore Platform</h3>
+            <h3 style={styles.sectionTitle} className="footer-col-title">
+              Explore Platform
+            </h3>
             <div style={styles.linksWrapper} className="footer-links-box">
               <a href="/" className="footer-custom-link">
                 <FaChevronRight className="chevron-icon" />
@@ -95,7 +107,9 @@ const Footer = () => {
           </div>
 
           <div style={styles.linksSection} className="footer-col-links">
-            <h3 style={styles.sectionTitle}>Access Control</h3>
+            <h3 style={styles.sectionTitle} className="footer-col-title">
+              Access Control
+            </h3>
             <div style={styles.linksWrapper} className="footer-links-box">
               <a href="/login" className="footer-custom-link">
                 <FaChevronRight className="chevron-icon" />
@@ -113,7 +127,9 @@ const Footer = () => {
           </div>
 
           <div style={styles.linksSection} className="footer-col-links">
-            <h3 style={styles.sectionTitle}>Legal & Operations</h3>
+            <h3 style={styles.sectionTitle} className="footer-col-title">
+              Legal & Operations
+            </h3>
             <div style={styles.linksWrapper} className="footer-links-box">
               <div className="footer-custom-link non-clickable">
                 <FaShieldAlt className="icon-gap" /> Privacy Architecture
@@ -170,34 +186,34 @@ const styles = {
     position: "relative",
     overflow: "hidden",
     background:
-      "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)",
-    padding: "85px 6% 30px",
-    borderTop: "1px solid rgba(226, 232, 240, 0.8)",
+      "linear-gradient(180deg, #fdfdfd 0%, #f8fafc 40%, #f1f5f9 100%)",
+    padding: "90px 6% 35px",
+    borderTop: "1px solid #e2e8f0",
     color: "#0f172a",
     boxSizing: "border-box",
   },
 
   blurOne: {
     position: "absolute",
-    top: "-60px",
-    left: "-60px",
-    width: "350px",
-    height: "350px",
+    top: "-100px",
+    left: "-100px",
+    width: "450px",
+    height: "450px",
     borderRadius: "50%",
-    background: "rgba(239, 68, 68, 0.05)",
-    filter: "blur(110px)",
+    background: "rgba(239, 68, 68, 0.04)",
+    filter: "blur(130px)",
     pointerEvents: "none",
   },
 
   blurTwo: {
     position: "absolute",
-    bottom: "-60px",
-    right: "-60px",
-    width: "350px",
-    height: "350px",
+    bottom: "-100px",
+    right: "-100px",
+    width: "450px",
+    height: "450px",
     borderRadius: "50%",
-    background: "rgba(148, 163, 184, 0.12)",
-    filter: "blur(110px)",
+    background: "rgba(239, 68, 68, 0.03)",
+    filter: "blur(130px)",
     pointerEvents: "none",
   },
 
@@ -209,79 +225,88 @@ const styles = {
   logoWrapper: {
     display: "flex",
     alignItems: "center",
-    gap: "16px",
-    marginBottom: "20px",
+    gap: "18px",
+    marginBottom: "22px",
   },
 
   logoIcon: {
-    width: "58px",
-    height: "58px",
-    borderRadius: "18px",
+    width: "56px",
+    height: "56px",
+    borderRadius: "16px",
     background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "1.5rem",
+    fontSize: "1.45rem",
     color: "white",
-    boxShadow: "0 10px 25px rgba(239, 68, 68, 0.25)",
+    boxShadow: "0 10px 25px rgba(239, 68, 68, 0.2)",
   },
 
   logoText: {
     margin: 0,
-    fontSize: "1.65rem",
+    fontSize: "1.7rem",
     fontWeight: "900",
-    letterSpacing: "-0.5px",
+    letterSpacing: "-0.6px",
     color: "#0f172a",
   },
 
   logoSubText: {
     margin: 0,
-    marginTop: "2px",
+    marginTop: "3px",
     color: "#64748b",
     fontSize: "0.78rem",
     fontWeight: "700",
-    letterSpacing: "0.5px",
+    letterSpacing: "0.6px",
+    textTransform: "uppercase",
   },
 
   description: {
     color: "#475569",
-    lineHeight: "1.75",
-    fontSize: "0.95rem",
-    marginBottom: "24px",
+    lineHeight: "1.8",
+    fontSize: "0.96rem",
+    marginBottom: "28px",
+    maxWidth: "440px",
   },
 
   contactItem: {
     display: "flex",
     alignItems: "center",
     gap: "16px",
-    padding: "14px 18px",
-    borderRadius: "16px",
-    background: "rgba(255, 255, 255, 0.65)",
-    border: "1px solid rgba(255, 255, 255, 0.8)",
+    padding: "16px 20px",
+    borderRadius: "20px",
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
     boxSizing: "border-box",
   },
 
-  contactIcon: {
+  contactIconWrap: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "12px",
+    background: "#fff5f5",
     color: "#ef4444",
-    fontSize: "1.1rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "1rem",
     flexShrink: 0,
   },
 
   contactLabel: {
     display: "block",
     fontSize: "0.72rem",
-    fontWeight: "700",
+    fontWeight: "800",
     color: "#94a3b8",
-    letterSpacing: "0.5px",
+    letterSpacing: "0.6px",
     textTransform: "uppercase",
   },
 
   contactValue: {
     margin: 0,
-    marginTop: "1px",
-    fontSize: "0.92rem",
+    marginTop: "2px",
+    fontSize: "0.95rem",
     fontWeight: "700",
-    color: "#1e293b",
+    color: "#0f172a",
     wordBreak: "break-word",
   },
 
@@ -292,17 +317,16 @@ const styles = {
 
   sectionTitle: {
     fontSize: "1.05rem",
-    marginBottom: "24px",
+    marginBottom: "26px",
     fontWeight: "800",
     color: "#0f172a",
     letterSpacing: "0.2px",
-    position: "relative",
   },
 
   linksWrapper: {
     display: "flex",
     flexDirection: "column",
-    gap: "4px",
+    gap: "6px",
   },
 
   divider: {
@@ -310,9 +334,8 @@ const styles = {
     zIndex: 2,
     width: "100%",
     height: "1px",
-    background:
-      "linear-gradient(90deg, rgba(226,232,240,0.2) 0%, rgba(226,232,240,1) 50%, rgba(226,232,240,0.2) 100%)",
-    marginBottom: "25px",
+    background: "#e2e8f0",
+    margin: "40px 0 30px 0",
   },
 
   bottomSection: {
@@ -321,25 +344,25 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: "20px",
+    gap: "24px",
   },
 
   copyright: {
     color: "#64748b",
     margin: 0,
-    fontSize: "0.88rem",
+    fontSize: "0.9rem",
     fontWeight: "600",
   },
 
   bottomRight: {
     display: "flex",
     alignItems: "center",
-    gap: "14px",
+    gap: "18px",
   },
 
   developedText: {
     color: "#64748b",
-    fontSize: "0.88rem",
+    fontSize: "0.9rem",
     fontWeight: "600",
   },
 
@@ -350,11 +373,11 @@ const styles = {
     color: "#0f172a",
     textDecoration: "none",
     fontWeight: "700",
-    fontSize: "0.88rem",
-    padding: "10px 16px",
+    fontSize: "0.9rem",
+    padding: "10px 18px",
     borderRadius: "14px",
-    background: "rgba(255, 255, 255, 0.65)",
-    border: "1px solid rgba(255, 255, 255, 0.8)",
+    background: "#ffffff",
+    border: "1px solid #e2e8f0",
   },
 
   scrollBtn: {
@@ -369,7 +392,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "0 8px 20px rgba(239, 68, 68, 0.2)",
+    boxShadow: "0 8px 20px rgba(239, 68, 68, 0.15)",
     flexShrink: 0,
   },
 };
@@ -377,9 +400,8 @@ const styles = {
 const responsiveStyles = `
 .footer-grid-wrapper {
   display: grid;
-  grid-template-columns: 1.5fr 0.8fr 0.8fr 0.9fr;
-  gap: 40px;
-  margin-bottom: 50px;
+  grid-template-columns: 1.6fr 0.8fr 0.8fr 0.8fr;
+  gap: 48px;
   position: relative;
   z-index: 2;
 }
@@ -387,14 +409,22 @@ const responsiveStyles = `
 .footer-contact-row {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 380px;
+  gap: 14px;
+  max-width: 360px;
 }
 
 .footer-glass-card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.footer-col-title::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 3px;
+  background: #ef4444;
+  border-radius: 2px;
+  margin-top: 8px;
 }
 
 .footer-custom-link {
@@ -402,10 +432,10 @@ const responsiveStyles = `
   align-items: center;
   color: #475569;
   text-decoration: none;
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   font-weight: 600;
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   background: transparent;
 }
@@ -416,19 +446,20 @@ const responsiveStyles = `
   width: 0;
   opacity: 0;
   color: #ef4444;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .footer-custom-link .icon-gap {
-  margin-right: 10px;
+  margin-right: 12px;
   color: #94a3b8;
   transition: color 0.25s ease;
 }
 
 .footer-custom-link:not(.non-clickable):hover {
-  background: rgba(255, 255, 255, 0.6);
+  background: #ffffff;
   color: #ef4444;
-  padding-left: 16px;
+  padding-left: 18px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
 }
 
 .footer-custom-link:not(.non-clickable):hover .chevron-icon {
@@ -443,15 +474,24 @@ const responsiveStyles = `
 
 .footer-custom-link.non-clickable {
   cursor: default;
-  font-weight: 500;
   color: #64748b;
+}
+
+.footer-contact-card {
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.01);
+}
+
+.footer-contact-card:hover {
+  border-color: #ef4444 !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.05);
 }
 
 .dev-active:hover {
   transform: translateY(-2px);
   background: #ffffff !important;
-  border-color: rgba(239, 68, 68, 0.2) !important;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04) !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.06) !important;
 }
 
 .footer-scroll-top-btn {
@@ -460,7 +500,7 @@ const responsiveStyles = `
 
 .footer-scroll-top-btn:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 25px rgba(239, 68, 68, 0.35) !important;
+  box-shadow: 0 12px 24px rgba(239, 68, 68, 0.3) !important;
 }
 
 .footer-credit-group {
@@ -469,14 +509,17 @@ const responsiveStyles = `
   gap: 14px;
 }
 
-
 @media (max-width: 1200px) {
   .footer-grid-wrapper {
-    grid-template-columns: 1.3fr 1fr 1fr !important;
+    grid-template-columns: 1.4fr 1fr 1fr !important;
+    gap: 40px !important;
   }
   .footer-col-brand {
     grid-column: span 3;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+  }
+  .footer-brand-desc {
+    max-width: 100% !important;
   }
   .footer-contact-row {
     max-width: 100% !important;
@@ -490,7 +533,7 @@ const responsiveStyles = `
 @media (max-width: 850px) {
   .footer-grid-wrapper {
     grid-template-columns: 1fr 1fr !important;
-    gap: 30px !important;
+    gap: 36px !important;
   }
   .footer-col-brand {
     grid-column: span 2;
@@ -512,12 +555,12 @@ const responsiveStyles = `
 
 @media (max-width: 550px) {
   footer {
-    padding: 60px 24px 25px !important;
+    padding: 70px 24px 30px !important;
   }
   
   .footer-grid-wrapper {
     grid-template-columns: 1fr !important;
-    gap: 32px !important;
+    gap: 36px !important;
   }
   
   .footer-col-brand {
@@ -535,9 +578,13 @@ const responsiveStyles = `
     text-align: center !important;
   }
   
+  .footer-col-title::after {
+    margin: 8px auto 0 auto !important;
+  }
+
   .footer-brand-desc {
     text-align: center !important;
-    margin-bottom: 20px !important;
+    margin-bottom: 24px !important;
   }
   
   .footer-contact-row {
@@ -558,7 +605,7 @@ const responsiveStyles = `
   .footer-custom-link {
     justify-content: center !important;
     width: 100%;
-    max-width: 280px;
+    max-width: 320px;
   }
   
   .footer-custom-link .chevron-icon {
@@ -566,12 +613,12 @@ const responsiveStyles = `
   }
   
   .footer-custom-link:not(.non-clickable):hover {
-    padding-left: 12px !important; 
+    padding-left: 14px !important; 
   }
   
   .footer-bottom-right-row {
     flex-direction: column !important;
-    gap: 16px !important;
+    gap: 18px !important;
   }
   
   .footer-credit-group {
@@ -580,8 +627,8 @@ const responsiveStyles = `
   }
   
   .footer-copyright-text {
-    font-size: 0.82rem !important;
-    line-height: 1.5;
+    font-size: 0.85rem !important;
+    line-height: 1.6;
   }
 }
 `;
