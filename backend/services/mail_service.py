@@ -158,18 +158,17 @@ def send_email_otp(receiver_email, otp):
     msg["From"] = Config.MAIL_EMAIL
     msg["To"] = receiver_email
 
+    
     try:
-        server = smtplib.SMTP(
+        print("Connecting to Gmail SMTP SSL...")
+
+        server = smtplib.SMTP_SSL(
             "smtp.gmail.com",
-            587,
+            465,
             timeout=10
         )
 
         print("Connected to SMTP")
-
-        server.starttls()
-
-        print("TLS Started")
 
         print("MAIL_EMAIL:", Config.MAIL_EMAIL)
         print("MAIL_PASSWORD_EXISTS:", bool(Config.MAIL_PASSWORD))
@@ -179,7 +178,11 @@ def send_email_otp(receiver_email, otp):
             Config.MAIL_PASSWORD
         )
 
+        print("Login Successful")
+
         server.send_message(msg)
+
+        print("Email Sent Successfully")
 
         server.quit()
 

@@ -29,7 +29,13 @@ def send_otp():
 
         otp_store[email] = str(otp)
 
-        send_email_otp(email, otp)
+        email_sent = send_email_otp(email, otp)
+
+        if not email_sent:
+            return {
+                "success": False,
+                "message": "Failed to send OTP email"
+            }, 500
 
         return {
             "success": True,
