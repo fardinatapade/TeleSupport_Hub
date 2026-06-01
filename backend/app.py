@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-
+import socket
 from routes.auth_routes import auth
 from routes.ticket_routes import ticket
 
@@ -26,6 +26,22 @@ def home():
         "success": True,
         "message": "TeleSupport Hub Backend Running"
     }
+
+@app.route("/network-test")
+def network_test():
+    try:
+        ip = socket.gethostbyname("smtp.gmail.com")
+
+        return {
+            "success": True,
+            "gmail_ip": ip
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }, 500
+    
 
 if __name__ == "__main__":
     app.run(
