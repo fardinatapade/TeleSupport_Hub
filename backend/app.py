@@ -27,6 +27,7 @@ def home():
         "message": "TeleSupport Hub Backend Running"
     }
 
+
 @app.route("/network-test")
 def network_test():
     try:
@@ -36,6 +37,28 @@ def network_test():
             "success": True,
             "gmail_ip": ip
         }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }, 500
+    
+    
+@app.route("/smtp-test")
+def smtp_test():
+    try:
+        sock = socket.create_connection(
+            ("smtp.gmail.com", 465),
+            timeout=10
+        )
+
+        sock.close()
+
+        return {
+            "success": True,
+            "message": "Port 465 reachable"
+        }
+
     except Exception as e:
         return {
             "success": False,
